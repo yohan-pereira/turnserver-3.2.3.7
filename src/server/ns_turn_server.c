@@ -3874,7 +3874,7 @@ static void write_http_echo(turn_turnserver *server, ts_ur_super_session *ss)
 		char content_http[1025];
 		const char* title = "TURN Server";
 		snprintf(content_http,sizeof(content_http)-1,"<!DOCTYPE html>\r\n<html>\r\n  <head>\r\n    <title>%s</title>\r\n  </head>\r\n  <body>\r\n    %s\r\n  </body>\r\n</html>\r\n",title,title);
-		snprintf(data_http,sizeof(data_http)-1,"HTTP/1.1 200 OK\r\nServer: %s\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: %d\r\n\r\n%s",TURN_SOFTWARE,(int)strlen(content_http),content_http);
+		snprintf(data_http,sizeof(data_http)-1,"HTTP/1.1 200 OK\r\nServer: %s\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: %d\r\n\r\n%s",TURN_SOFTWARE,(int)strlen(content_http),content_http);
 		len_http = strlen(data_http);
 		ns_bcopy(data_http,data,len_http);
 		ioa_network_buffer_set_size(nbh_http,len_http);
