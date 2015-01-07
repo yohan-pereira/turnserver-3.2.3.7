@@ -43,20 +43,21 @@
 
 ////////// LOG TIME OPTIMIZATION ///////////
 
-static volatile turn_time_t log_start_time = 0;
+//static volatile turn_time_t log_start_time = 0;
 volatile int _log_time_value_set = 0;
 volatile turn_time_t _log_time_value = 0;
 
-static inline turn_time_t log_time(void)
-{
-  if(!log_start_time)
-    log_start_time = turn_time();
-
-  if(_log_time_value_set)
-    return (_log_time_value - log_start_time);
-
-  return (turn_time() - log_start_time);
-}
+//static inline turn_time_t log_time(void)
+//{
+//  //if(!log_start_time)
+//  //  log_start_time = turn_time();
+//
+//  //if(_log_time_value_set)
+//  //  return (_log_time_value - log_start_time);
+//
+//  //return (turn_time() - log_start_time);
+//  return (turn_time());
+//}
 
 ////////// MUTEXES /////////////
 
@@ -173,13 +174,19 @@ void turn_log_func_default(TURN_LOG_LEVEL level, const s08bits* format, ...)
 #define MAX_RTPPRINTF_BUFFER_SIZE (1024)
 		char s[MAX_RTPPRINTF_BUFFER_SIZE+1];
 #undef MAX_RTPPRINTF_BUFFER_SIZE
+		//generate string timestamp
+		time_t t = time(NULL);
+		char* tstr = ctime(&t);
+		//ctime returns a newline!!
+		tstr[strlen(tstr) -1] = 0;
+
 		if (level == TURN_LOG_LEVEL_ERROR) {
-			snprintf(s,sizeof(s)-100,"%lu: ERROR: ",(unsigned long)log_time());
+			snprintf(s,sizeof(s)-100,"%s: ERROR: ", tstr);
 			size_t slen = strlen(s);
 			vsnprintf(s+slen,sizeof(s)-slen-1,format, args);
 			fwrite(s,strlen(s),1,stdout);
 		} else if(!no_stdout_log) {
-			snprintf(s,sizeof(s)-100,"%lu: ",(unsigned long)log_time());
+						snprintf(s,sizeof(s)-100,"%s: ",tstr);
 			size_t slen = strlen(s);
 			vsnprintf(s+slen,sizeof(s)-slen-1,format, args);
 			fwrite(s,strlen(s),1,stdout);
@@ -221,6 +228,27 @@ void addr_debug_print(int verbose, const ioa_addr *addr, const s08bits* s)
 		}
 	}
 }
+
+char* ip_to_str(const ioa_addr *addr, char *s)
+{
+  if(!addr) {
+    return "";
+  }
+  s08bits addrbuf[INET6_ADDRSTRLEN];
+  if (addr->ss.sa_family == AF_INET) {
+    sprintf(s, "IPv4 %s:%d", inet_ntop(AF_INET, &addr->s4.sin_addr, addrbuf, INET6_ADDRSTRLEN), nswap16(addr->s4.sin_port));
+  } else if (addr->ss.sa_family == AF_INET6) {
+    sprintf(s, "IPv4 %s:%d", inet_ntop(AF_INET6, &addr->s6.sin6_addr, addrbuf, INET6_ADDRSTRLEN), nswap16(addr->s6.sin6_port));
+  } else {
+    if (addr_any_no_port(addr)) {
+      sprintf(s, "IP. 0.0.0.0:%d", nswap16(addr->s4.sin_port));
+    } else {
+      sprintf(s, "wrong IP address family: %d", (addr->ss.sa_family));
+    }
+  }
+  return s;
+}
+
 
 /*************************************/
 
@@ -492,9 +520,15 @@ int vrtpprintf(TURN_LOG_LEVEL level, const char *format, va_list args)
 	char s[MAX_RTPPRINTF_BUFFER_SIZE+1];
 #undef MAX_RTPPRINTF_BUFFER_SIZE
 
+	//generate string timestamp
+	time_t t = time(NULL);
+	char* tstr = ctime(&t);
+	//ctime returns a newline!!
+	tstr[strlen(tstr) -1] = 0;
+
 	size_t sz;
 
-	snprintf(s, sizeof(s), "%lu: ",(unsigned long)log_time());
+	snprintf(s, sizeof(s), "%s: ", tstr);
 	sz=strlen(s);
 	vsnprintf(s+sz, sizeof(s)-1-sz, format, args);
 	s[sizeof(s)-1]=0;

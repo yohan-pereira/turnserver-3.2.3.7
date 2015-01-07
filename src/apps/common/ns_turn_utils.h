@@ -32,6 +32,7 @@
 #define __TURN_ULIB__
 
 #if !defined(TURN_LOG_FUNC)
+//#define TURN_LOG_FUNC(level, ...) printf (__VA_ARGS__)
 #define TURN_LOG_FUNC turn_log_func_default
 #endif
 
@@ -63,6 +64,7 @@ void set_simple_log(int val);
 void turn_log_func_default(TURN_LOG_LEVEL level, const s08bits* format, ...);
 
 void addr_debug_print(int verbose, const ioa_addr *addr, const s08bits* s);
+char* ip_to_str(const ioa_addr *addr, char *str);
 
 /* Log */
 
