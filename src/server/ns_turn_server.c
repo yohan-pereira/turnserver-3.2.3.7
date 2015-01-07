@@ -57,14 +57,14 @@ static inline void log_method(ts_ur_super_session* ss, const char *method, int e
 	  if(!method) method = "unknown";
 	  if(!err_code) {
 		TURN_LOG_FUNC(TURN_LOG_LEVEL_INFO,
-			"remote %s session %018llu: user <%s>: incoming packet %s processed, success\n",
-			remote_ip, (unsigned long long)(ss->id), (const char*)(ss->username),method);
+			"remote %s : incoming packet %s processed, success\n",
+			remote_ip, method);
 		
           } else {
                 if(!reason) reason=(const u08bits*)"Unknown error";
                 TURN_LOG_FUNC(TURN_LOG_LEVEL_INFO,
-                    "remote %s session %018llu: realm <%s> user <%s>: incoming packet %s processed, error %d: %s\n",
-                    remote_ip, (unsigned long long)(ss->id), (const char*)(ss->username), method, err_code, reason);
+                    "remote %s : incoming packet %s processed, error %d: %s\n",
+                    remote_ip, method, err_code, reason);
           }
   }
 }
